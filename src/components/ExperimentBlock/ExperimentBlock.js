@@ -10,7 +10,7 @@ import { randomFromInterval } from '../../utils';
 
 
 const jsPsych = window.jsPsych;
-const refDuration = 5000;
+const refDuration = 3000;
 
 let staircase = null;
 
@@ -51,7 +51,8 @@ class ExperimentBlock extends Component {
       return refDuration + (sign * delta);
     },
     on_finish: function(data) {
-      data.presentation_duration = this.duration;
+      data.pulse_duration_delta = staircase.getValue();
+      data.pulse_duration = this.duration;
       data.correct_answer = this.duration < refDuration ? 'faster' : 'slower';
     }
   }
@@ -80,7 +81,12 @@ class ExperimentBlock extends Component {
       else {
         data.responded_correctly = (response === '2');
       }
+
+      staircase.addResponse(data.responded_correctly);
+      // staircase.addResponse( (response === '1') );
     }
+
+    
   }
 
   fixation = {
@@ -95,14 +101,26 @@ class ExperimentBlock extends Component {
     super(props);
 
     staircase = new Staircase({
-      firstVal: 2000,
+      firstVal: 1500,
       down: 3,
-      stepSizes: [8, 4, 4, 2, 2]
+      stepSizes: [8, 4, 4, 2, 2],
+      maxValue: 3000,
+      verbosity: 1
     });
   }
   
   getTimeline() {
     const timeline = [];
+
+    // const test_procedure = {
+    //   timeline: [
+    //     this.fixation,
+    //     this.forcedChoice
+    //   ],
+    //   repetitions: 2
+    // }
+
+    this.fixation.data.beginTrial = true;
 
     const test_procedure = {
       timeline: [
@@ -111,7 +129,7 @@ class ExperimentBlock extends Component {
         this.targetPulse,
         this.forcedChoice
       ],
-      repetitions: 3
+      repetitions: 6
     }
     
     timeline.push(test_procedure);
@@ -134,6 +152,54 @@ class ExperimentBlock extends Component {
       jsPsych.data.get().json()
     );
     console.log('done data: ', trialData);
+    console.log('staircase:', staircase);
+
+    let data = this.collectTrials(trialData);
+    // data.trialData = trialData;
+
+    // gather results
+    this.props.submitResults(data);
+    this.props.finishStep();
+  }
+
+  collectTrials(trialData) {
+    const trials = [];
+    let currentTrial = null
+    let trialIndex = 1
+    trialData.forEach( (trialPart) => {
+        // delete trialPart.stimulus
+
+        if (trialPart.beginTrial) {
+            if (currentTrial) {
+                trials.push(currentTrial);
+            }
+            currentTrial = {index: trialIndex++};
+        }
+
+        [
+          'fixation',
+          'referencePulse',
+          'targetPulse',
+          'forcedChoice'
+        ].forEach((n) => {
+          if (trialPart[n]) {
+            currentTrial[`${n}_time_elapsed`] = trialPart.time_elapsed;
+          }
+        });
+
+        if (trialPart.targetPulse) {
+          currentTrial.pulse_duration_delta = trialPart.pulse_duration_delta;
+          currentTrial.correct_answer = trialPart.correct_answer;
+        }
+
+        if (trialPart.forcedChoice) {
+          currentTrial.response = trialPart.response;
+          currentTrial.responded_correctly = trialPart.responded_correctly;
+        }
+    });
+    trials.push(currentTrial);
+
+    return trials;
   }
 
   componentDidMount() {

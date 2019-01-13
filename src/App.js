@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import ExperimentBlock from './components/ExperimentBlock/ExperimentBlock';
+import TaskManager from './components/TaskManager/TaskManager';
 
 
 class App extends Component {
@@ -8,7 +8,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-body">
-          <ExperimentBlock />
+          <TaskManager />
         </div>
       </div>
     );
