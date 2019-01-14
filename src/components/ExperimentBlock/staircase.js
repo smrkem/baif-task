@@ -49,7 +49,7 @@ class Staircase {
     console.log('currDir: ', this.currentDirection);    
     
 
-    const trialIndex = this.responses.length - 1;
+    const trialIndex = this.responses.length;
     console.log('trialIndex: ', trialIndex);
 
     if (!correctResponse && this.successiveBad >= this.n_up) {
@@ -60,9 +60,9 @@ class Staircase {
         this.reversal_indexes.push(trialIndex);
         this.incrementStepSizeIndex();
 
-        // this.stairs.reversed = true
         if (this.verbosity > 0) {
           console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
+          console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
           console.log('reversal!!!!! new currentDirection: ', '1');
         }
       }
@@ -71,27 +71,29 @@ class Staircase {
       if (this.verbosity > 0) {
           console.log("Decreasing stair difficulty. Setting new value to " + newVal + "ms.");
       }
+      console.log('=============================');
       return Math.min(newVal, this.maxValue);
     }
     else if (correctResponse && this.successiveGood >= this.n_down) {
       this.successiveGood = 0;
 
       if (this.currentDirection === 1) {
-        if (this.verbosity > 0) {
-          console.log('reversal!!!!!');
-          console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
-          console.log('reversal!!!!! new currentDirection: ', '-1');
-        }
         this.reversal_indexes.push(trialIndex);
         this.incrementStepSizeIndex();
 
-        // this reversed true
+        if (this.verbosity > 0) {
+          console.log('reversal!!!!!');
+          console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
+          console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
+          console.log('reversal!!!!! new currentDirection: ', '-1');
+        }
       }
       this.currentDirection = -1;
       const newVal = this._nextVal();
       if (this.verbosity > 0) {
         console.log("Increasing stair difficulty. Setting new value to " + newVal + "ms.");
       }
+      console.log('=============================');
       return Math.min(newVal, this.maxValue);
     }
     else if (this.currentDirection === 0) {

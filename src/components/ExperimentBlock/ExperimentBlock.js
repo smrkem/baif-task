@@ -129,7 +129,7 @@ class ExperimentBlock extends Component {
         this.targetPulse,
         this.forcedChoice
       ],
-      repetitions: 6
+      repetitions: 14
     }
     
     timeline.push(test_procedure);
@@ -158,7 +158,10 @@ class ExperimentBlock extends Component {
     // data.trialData = trialData;
 
     // gather results
-    this.props.submitResults(data);
+    this.props.submitResults({
+      data: data,
+      reversalIndices: staircase.reversal_indexes
+    });
     this.props.finishStep();
   }
 

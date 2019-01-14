@@ -7,7 +7,8 @@ class Results extends Component {
     super(props);
     const points = [];
 
-    props.results.forEach(r => {
+    let i = 1;
+    props.results.data.forEach(r => {
       const point = {
         x: r.forcedChoice_time_elapsed / 1000,
         y: r.pulse_duration_delta,
@@ -15,7 +16,13 @@ class Results extends Component {
         markerType: r.responded_correctly ? "triangle" : "cross",
         markerSize: 10
       }
+      if (props.results.reversalIndices.includes(i)) {
+        point.markerColor = "#bada55";
+        point.markerType = "circle";
+        point.markerSize = 20;
+      }
       points.push(point);
+      i++;
     });
     this.state = { points };
   }
@@ -38,7 +45,8 @@ class Results extends Component {
       },
       axisY:{
         includeZero: false,
-        title: "Target Pulse Duration (ms)"
+        title: "Target Pulse Delta (ms)",
+        viewportMaximum: 3000
       },
       axisX: {
         title: "Experimental Time (s)"
