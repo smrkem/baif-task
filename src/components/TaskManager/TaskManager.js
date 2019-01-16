@@ -23,6 +23,17 @@ class TaskManager extends Component {
     this.advanceStep = this.advanceStep.bind(this);
     this.onSubmitResults = this.onSubmitResults.bind(this);
     this.onSubmitSettings = this.onSubmitSettings.bind(this);
+
+    if (this.state.debug) {
+      this.state.settings = {
+        initial_delta: 1400,
+        max_delta: 2000,
+        n_down: 2,
+        num_reversals: 6,
+        num_trials: 3,
+        reference_duration: 3000
+      }
+    }
   }
 
   showing() {
@@ -44,13 +55,7 @@ class TaskManager extends Component {
 
   onSubmitSettings(settings) {
     if (this.state.debug) {
-      settings = {
-        initial_delta: 1400,
-        n_down: 2,
-        num_reversals: 6,
-        num_trials: 3,
-        reference_duration: 3000
-      }
+      return;
     }
     this.setState({ settings });
   }
@@ -59,6 +64,7 @@ class TaskManager extends Component {
     if (this.showing() === 'settings') {
       return (
         <Settings 
+          defaults={this.state.settings}
           submitSettings={this.onSubmitSettings}
           finishStep={this.advanceStep}
         />

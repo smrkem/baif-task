@@ -14,6 +14,13 @@ class Settings extends React.Component {
   constructor(props) {
     super(props);
 
+    const { defaults } = props;
+    console.log(defaults);
+
+    defaults && Object.keys(defaults).forEach(key => {
+      this.state[key] = defaults[key]
+    })
+
     this.onSubmit = this.onSubmit.bind(this);
     this.handleFieldChange = this.handleFieldChange.bind(this);
   }

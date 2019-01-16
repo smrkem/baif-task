@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 const CanvasJS = window.CanvasJS;
 
 class Results extends Component {
@@ -25,16 +26,14 @@ class Results extends Component {
       i++;
     });
     this.state = { points };
+
+    this.sendData = this.sendData.bind(this)
   }
 
   componentDidMount() {
     // const points = [
     //   {x: 5.416, y: 350, markerColor: "red", markerType: "cross", markerSize: 10},
-    //   {x: 9.631, y: 879.1602510283531, markerColor: "green", markerType: "triangle", markerSize: 10},
-    //   {x: 13.84, y: 879.1602510283531, markerColor: "green", markerType: "triangle", markerSize: 10},
-    //   {x: 19.228, y: 879.1602510283531, markerColor: "red", markerType: "cross", markerSize: 10},
-    //   {x: 22.951, y: 2208.3507056806766, markerColor: "red", markerType: "cross", markerSize: 10},
-    //   {x: 26.215, y: 2547.126173613898, markerColor: "#bada55", markerType: "circle", markerSize: 30}
+    //   {x: 9.631, y: 879.1602510283531, markerColor: "green", markerType: "triangle", markerSize: 10}
     // ];
     // const ctx = document.getElementById('theGraph').getContext('2d');
     const chart = new CanvasJS.Chart("graph", {
@@ -58,6 +57,21 @@ class Results extends Component {
 
     chart.render();
   }
+
+  sendData() {
+    const DATA_API_URL = "https://ljcs7k58sf.execute-api.us-east-1.amazonaws.com/dev/study-data/"
+    
+    console.log("SENDING DATA")
+    console.log(this.props.results)
+
+    axios.post(DATA_API_URL, this.props.results).then(response => {
+      console.log("SUCCESS")
+      console.log('response', response)
+    }).catch(error => {
+      console.log("ERROR: ", error)
+    })   
+
+  }
 2
   render() {
     let { results, settings } = this.props;
@@ -80,6 +94,16 @@ class Results extends Component {
           <h3>Results:</h3>
           <pre>
             {JSON.stringify(results, null, 2)}
+          </pre>
+        </div>
+        <div className="results-api">
+          <h3>Data API:</h3>
+          <button
+            onClick={this.sendData}
+            className="btn btn-primary">
+            SEND DATA</button>
+          <pre>
+
           </pre>
         </div>
       </div>
