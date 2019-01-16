@@ -25,3 +25,18 @@ body > #root > div {
     width: 100px;
     text-align: right;
 }
+
+
+#results-wr {
+
+}
+
+#results-wr #graph {
+    height: 500px;
+}
+
+#results-wr pre {
+    background: #eee;
+    font-size: 0.8rem;
+    padding: 2rem;
+}

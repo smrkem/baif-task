@@ -44,7 +44,7 @@ class Results extends Component {
         text: "Response Staircase"
       },
       axisY:{
-        includeZero: false,
+        includeZero: true,
         title: "Target Pulse Delta (ms)"
       },
       axisX: {
@@ -60,6 +60,7 @@ class Results extends Component {
   }
 2
   render() {
+    let { results, settings } = this.props;
     console.log('results with', this.props.results);
 
     return (
@@ -68,6 +69,18 @@ class Results extends Component {
         <hr />
         <div id="graph">
           <canvas id="theGraph" width="800" height="500"></canvas>
+        </div>
+        <div className="results-settings">
+          <h3>With Settings:</h3>
+          <pre>
+            {JSON.stringify(settings, null, 2)}
+          </pre>
+        </div>
+        <div className="results-data">
+          <h3>Results:</h3>
+          <pre>
+            {JSON.stringify(results, null, 2)}
+          </pre>
         </div>
       </div>
     )

@@ -14,7 +14,8 @@ class TaskManager extends Component {
       'results'
     ],
     stepIndex: 0,
-    results: {}
+    results: {},
+    debug: 1
   }
 
   constructor(props) {
@@ -42,6 +43,15 @@ class TaskManager extends Component {
   }
 
   onSubmitSettings(settings) {
+    if (this.state.debug) {
+      settings = {
+        initial_delta: 1400,
+        n_down: 2,
+        num_reversals: 6,
+        num_trials: 3,
+        reference_duration: 3000
+      }
+    }
     this.setState({ settings });
   }
 
@@ -82,7 +92,7 @@ class TaskManager extends Component {
 
     if (this.showing() === 'results') {
       return (
-        <Results results={this.state.results} />
+        <Results results={this.state.results} settings={this.state.settings} />
       )
     }
   }
