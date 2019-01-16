@@ -13,7 +13,7 @@ class Staircase {
     this.stepSizes = settings.stepSizes;
     this.values = [settings.firstVal];
     this.responses = []; // true for correct, false for miss
-    this.maxValue = settings.maxValue || 10000;
+    this.maxValue = settings.maxValue || 2000;
     this.successiveGood = 0;
     this.successiveBad = 0;
     this.n_up = settings.up || 1;
@@ -45,11 +45,8 @@ class Staircase {
   }
 
   getNextValue(correctResponse) {
-    console.log('responses: ', this.responses);
-    console.log('currDir: ', this.currentDirection);    
-    
-
     const trialIndex = this.responses.length;
+    console.log('responses: ', this.responses); 
     console.log('trialIndex: ', trialIndex);
 
     if (!correctResponse && this.successiveBad >= this.n_up) {
@@ -61,40 +58,38 @@ class Staircase {
         this.incrementStepSizeIndex();
 
         if (this.verbosity > 0) {
-          console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
           console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
-          console.log('reversal!!!!! new currentDirection: ', '1');
         }
       }
       this.currentDirection = 1;
-      const newVal = this._nextVal();
+      const newVal = Math.min(this._nextVal(), this.maxValue);
       if (this.verbosity > 0) {
           console.log("Decreasing stair difficulty. Setting new value to " + newVal + "ms.");
       }
       console.log('=============================');
-      return Math.min(newVal, this.maxValue);
+      return newVal;
     }
     else if (correctResponse && this.successiveGood >= this.n_down) {
       this.successiveGood = 0;
 
-      if (this.currentDirection === 1) {
-        this.reversal_indexes.push(trialIndex);
-        this.incrementStepSizeIndex();
+      // if (this.currentDirection === 1) {
+      //   this.reversal_indexes.push(trialIndex);
+      //   this.incrementStepSizeIndex();
 
-        if (this.verbosity > 0) {
-          console.log('reversal!!!!!');
-          console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
-          console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
-          console.log('reversal!!!!! new currentDirection: ', '-1');
-        }
-      }
+      //   if (this.verbosity > 0) {
+      //     console.log('reversal!!!!!');
+      //     console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
+      //     console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
+      //     console.log('reversal!!!!! new currentDirection: ', '-1');
+      //   }
+      // }
       this.currentDirection = -1;
-      const newVal = this._nextVal();
+      const newVal = Math.min(this._nextVal(), this.maxValue);
       if (this.verbosity > 0) {
         console.log("Increasing stair difficulty. Setting new value to " + newVal + "ms.");
       }
       console.log('=============================');
-      return Math.min(newVal, this.maxValue);
+      return newVal;
     }
     else if (this.currentDirection === 0) {
       console.log('correctResponse is ', correctResponse);

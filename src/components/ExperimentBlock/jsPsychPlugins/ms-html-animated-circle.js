@@ -3,6 +3,7 @@ const minRadius = 50;
 const maxRadius = 150;
 const pauseTime = 200;
 const radiusRange = maxRadius - minRadius;
+const fillColor = "lightgreen";
 
 jsPsych.plugins['ms-animated-circle'] = (function(){
 
@@ -95,7 +96,7 @@ jsPsych.plugins['ms-animated-circle'] = (function(){
       }
       
       ctx.beginPath();
-      ctx.fillStyle = "#bada55";
+      ctx.fillStyle = fillColor;
       ctx.arc(hCenter, vCenter, newRadius, 0, 2 * Math.PI);
       ctx.fill();
 

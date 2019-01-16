@@ -1,17 +1,27 @@
 import React, { Component } from 'react';
 import ExperimentBlock from '../ExperimentBlock/ExperimentBlock';
 import Results from '../Results/Results';
+import Settings from '../Settings/Settings';
 
 
 class TaskManager extends Component {
   state = {
+    settings: null,
     steps: [
-      // 'intro',
+      'settings',
+      'intro',
       'experiment',
       'results'
     ],
     stepIndex: 0,
     results: {}
+  }
+
+  constructor(props) {
+    super(props);
+    this.advanceStep = this.advanceStep.bind(this);
+    this.onSubmitResults = this.onSubmitResults.bind(this);
+    this.onSubmitSettings = this.onSubmitSettings.bind(this);
   }
 
   showing() {
@@ -31,11 +41,31 @@ class TaskManager extends Component {
     this.setState({ results });
   }
 
+  onSubmitSettings(settings) {
+    this.setState({ settings });
+  }
+
   render() {
+    if (this.showing() === 'settings') {
+      return (
+        <Settings 
+          submitSettings={this.onSubmitSettings}
+          finishStep={this.advanceStep}
+        />
+      )
+    }
+
     if (this.showing() === 'intro') {
       return (
-        <div>
-          <p>BAIF intro</p>
+        <div className="vertical-center">
+          <div className="container text-center">
+            <h2>Welcome to the BAIF task!</h2>
+            <p>BAIF intro and instructions placeholder.</p>
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={this.advanceStep}
+              >Begin</button>
+          </div>
         </div>
       )
     }
@@ -43,8 +73,9 @@ class TaskManager extends Component {
     if (this.showing() === 'experiment') {
       return (
         <ExperimentBlock 
-          submitResults={this.onSubmitResults.bind(this)} 
-          finishStep={this.advanceStep.bind(this)}
+          settings={this.state.settings}
+          submitResults={this.onSubmitResults} 
+          finishStep={this.advanceStep}
           />
       )
     }

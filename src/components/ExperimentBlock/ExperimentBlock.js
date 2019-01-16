@@ -10,12 +10,32 @@ import { randomFromInterval } from '../../utils';
 
 
 const jsPsych = window.jsPsych;
-const refDuration = 3000;
 
 let staircase = null;
+let REFERENCE_DURATION = null;
+let NUM_REVERSALS = null;
+let NUM_TRIALS = null;
 
 class ExperimentBlock extends Component {
   experiment = null;
+
+  constructor(props) {
+    super(props);
+
+    const { settings } = props;
+    console.log('settings: ', settings);
+    REFERENCE_DURATION = settings.reference_duration;
+    NUM_TRIALS = settings.num_trials;
+    NUM_REVERSALS = settings.num_reversals;
+
+    staircase = new Staircase({
+      firstVal: settings.initial_delta,
+      down: settings.n_down,
+      stepSizes: [8, 4, 4, 2, 2],
+      maxValue: settings.max_delta,
+      verbosity: 1
+    });
+  }
 
   instructions = {
     type: "html-keyboard-response",
@@ -36,7 +56,7 @@ class ExperimentBlock extends Component {
   referencePulse = {
     type: "ms-animated-circle",
     data: {referencePulse: true},
-    duration: refDuration,
+    duration: function() { return REFERENCE_DURATION; }
   }
 
   targetPulse = {
@@ -44,16 +64,16 @@ class ExperimentBlock extends Component {
     data: {targetPulse: true},
     duration: function() {
       const delta = staircase.getValue();
-      let sign = 1;
-      if ((delta + 1200) < refDuration) {
-        sign = !!randomFromInterval(0,2) ? 1 : -1;
+      let sign = !!randomFromInterval(0,2) ? 1 : -1;
+      if ((delta + 1200) > REFERENCE_DURATION) {
+        sign = 1;
       }
-      return refDuration + (sign * delta);
+      return REFERENCE_DURATION + (sign * delta);
     },
     on_finish: function(data) {
       data.pulse_duration_delta = staircase.getValue();
       data.pulse_duration = this.duration;
-      data.correct_answer = this.duration < refDuration ? 'faster' : 'slower';
+      data.correct_answer = this.duration < REFERENCE_DURATION ? 'faster' : 'slower';
     }
   }
 
@@ -83,7 +103,10 @@ class ExperimentBlock extends Component {
       }
 
       staircase.addResponse(data.responded_correctly);
-      // staircase.addResponse( (response === '1') );
+      
+      if (staircase.reversal_indexes.length >= NUM_REVERSALS) {
+        jsPsych.endExperiment();
+      }
     }
 
     
@@ -97,17 +120,6 @@ class ExperimentBlock extends Component {
     trial_duration: 500
   }
 
-  constructor(props) {
-    super(props);
-
-    staircase = new Staircase({
-      firstVal: 1500,
-      down: 3,
-      stepSizes: [8, 4, 4, 2, 2],
-      maxValue: 3000,
-      verbosity: 1
-    });
-  }
   
   getTimeline() {
     const timeline = [];
@@ -129,7 +141,7 @@ class ExperimentBlock extends Component {
         this.targetPulse,
         this.forcedChoice
       ],
-      repetitions: 14
+      repetitions: NUM_TRIALS
     }
     
     timeline.push(test_procedure);

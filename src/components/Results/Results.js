@@ -45,8 +45,7 @@ class Results extends Component {
       },
       axisY:{
         includeZero: false,
-        title: "Target Pulse Delta (ms)",
-        viewportMaximum: 3000
+        title: "Target Pulse Delta (ms)"
       },
       axisX: {
         title: "Experimental Time (s)"
