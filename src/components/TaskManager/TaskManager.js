@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import ExperimentBlock from '../ExperimentBlock/ExperimentBlock';
 import Results from '../Results/Results';
 import Settings from '../Settings/Settings';
+import Login from '../Login/Login';
 
 
 class TaskManager extends Component {
   state = {
     settings: null,
     steps: [
+      'login',
       'settings',
       'intro',
       'experiment',
@@ -61,6 +63,12 @@ class TaskManager extends Component {
   }
 
   render() {
+    if (this.showing() === 'login') {
+      return (
+        <Login />
+      )
+    }
+
     if (this.showing() === 'settings') {
       return (
         <Settings 
