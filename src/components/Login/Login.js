@@ -3,7 +3,7 @@ import axios from 'axios';
 
 class Login extends Component {
   state = {
-    token: 'mDn7CymhatBTyIlCDvshyA'
+    token: ''
   }
 
   constructor(props) {

@@ -40,9 +40,6 @@ class TaskManager extends Component {
       reference_duration: 5000
     }
 
-    // id 3266 : wkBcF5KiVqc1aeva9XVnBg
-    // matt : mDn7CymhatBTyIlCDvshyA
-
     // Debugging:
     // this.state.results = {
     //   "data": [
@@ -135,7 +132,6 @@ class TaskManager extends Component {
   }
 
   render() {
-    console.log('showing: ', this.showing());
 
     if (this.showing() === 'login') {
       return (
@@ -154,7 +150,6 @@ class TaskManager extends Component {
     }
 
     if (this.showing() === 'intro') {
-      console.log('settings auth: ', this.state.auth)
       return (
         <div className="vertical-center">
           <div className="container text-center">
