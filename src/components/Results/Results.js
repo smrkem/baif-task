@@ -25,9 +25,19 @@ class Results extends Component {
       points.push(point);
       i++;
     });
-    this.state = { points };
+    this.state = { 
+      points,
+      dataAPIMessages: []
+    };
 
     this.sendData = this.sendData.bind(this)
+    this.addDataAPIMessage = this.addDataAPIMessage.bind(this)
+  }
+
+  addDataAPIMessage(message) {
+    const dataAPIMessages = [...this.state.dataAPIMessages]
+    dataAPIMessages.push(message)
+    this.setState({dataAPIMessages})
   }
 
   componentDidMount() {
@@ -65,14 +75,14 @@ class Results extends Component {
     console.log(this.props.results)
 
     axios.post(DATA_API_URL, this.props.results).then(response => {
-      console.log("SUCCESS")
-      console.log('response', response)
-    }).catch(error => {
-      console.log("ERROR: ", error)
+      this.addDataAPIMessage(response)
+    }, error => {
+      console.log("ERROR: ", error.response)
+      this.addDataAPIMessage(error.response)
     })   
 
   }
-2
+
   render() {
     let { results, settings } = this.props;
     console.log('results with', this.props.results);
@@ -102,8 +112,21 @@ class Results extends Component {
             onClick={this.sendData}
             className="btn btn-primary">
             SEND DATA</button>
-          <pre>
 
+          <div>
+            {this.state.dataAPIMessages.map((msg, ind) => {
+              console.log('msg', msg)
+              return (
+                <pre key={ind}>{JSON.stringify({
+                  data: msg.data,
+                  status: msg.status
+                }, null, 2)}</pre>
+              )
+            })}
+          </div>
+          
+          <pre>
+            
           </pre>
         </div>
       </div>

@@ -92,8 +92,12 @@ class Staircase {
       return newVal;
     }
     else if (this.currentDirection === 0) {
-      console.log('correctResponse is ', correctResponse);
-      this.currentDirection = correctResponse ? -1 : 1;
+      if (correctResponse && this.successiveGood >= this.n_down) {
+        this.currentDirection = -1;  
+      }
+      else if (!correctResponse && this.currentDirection >= this.n_up) {
+        this.currentDirection = 1;
+      }
     }
 
     console.log('=============================');
