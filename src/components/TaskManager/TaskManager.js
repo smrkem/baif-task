@@ -4,6 +4,10 @@ import Results from '../Results/Results';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
 
+const ADMINS = [
+  "matt",
+  "norm"
+]
 
 class TaskManager extends Component {
   state = {
@@ -15,9 +19,9 @@ class TaskManager extends Component {
       'experiment',
       'results'
     ],
+    auth: {},
     stepIndex: 0,
-    results: {},
-    debug: 1
+    results: {}
   }
 
   constructor(props) {
@@ -25,17 +29,59 @@ class TaskManager extends Component {
     this.advanceStep = this.advanceStep.bind(this);
     this.onSubmitResults = this.onSubmitResults.bind(this);
     this.onSubmitSettings = this.onSubmitSettings.bind(this);
+    this.onLogin = this.onLogin.bind(this);
 
-    if (this.state.debug) {
-      this.state.settings = {
-        initial_delta: 1400,
-        max_delta: 2000,
-        n_down: 2,
-        num_reversals: 6,
-        num_trials: 3,
-        reference_duration: 3000
-      }
+    this.state.settings = {
+      initial_delta: 2000,
+      max_delta: 2000,
+      n_down: 3,
+      num_reversals: 6,
+      num_trials: 40,
+      reference_duration: 5000
     }
+
+    // id 3266 : wkBcF5KiVqc1aeva9XVnBg
+    // matt : mDn7CymhatBTyIlCDvshyA
+
+    // Debugging:
+    // this.state.results = {
+    //   "data": [
+    //     {
+    //       "index": 1,
+    //       "fixation_time_elapsed": 507,
+    //       "referencePulse_time_elapsed": 3522,
+    //       "targetPulse_time_elapsed": 5143,
+    //       "pulse_duration_delta": 1400,
+    //       "correct_answer": "faster",
+    //       "forcedChoice_time_elapsed": 7312,
+    //       "response": "1",
+    //       "responded_correctly": true
+    //     },
+    //     {
+    //       "index": 2,
+    //       "fixation_time_elapsed": 7816,
+    //       "referencePulse_time_elapsed": 10824,
+    //       "targetPulse_time_elapsed": 15245,
+    //       "pulse_duration_delta": 1400,
+    //       "correct_answer": "slower",
+    //       "forcedChoice_time_elapsed": 16016,
+    //       "response": "1",
+    //       "responded_correctly": false
+    //     },
+    //     {
+    //       "index": 3,
+    //       "fixation_time_elapsed": 16519,
+    //       "referencePulse_time_elapsed": 19521,
+    //       "targetPulse_time_elapsed": 24541,
+    //       "pulse_duration_delta": 2000,
+    //       "correct_answer": "slower",
+    //       "forcedChoice_time_elapsed": 25622,
+    //       "response": "2",
+    //       "responded_correctly": true
+    //     }
+    //   ],
+    //   "reversalIndices": []
+    // }
   }
 
   showing() {
@@ -51,6 +97,32 @@ class TaskManager extends Component {
     this.setState({stepIndex: this.state.stepIndex + 1});
   }
 
+  onLogin(auth) {
+    this.setState({auth})
+
+    if (ADMINS.includes(auth.participantId)) {
+      this.setState({
+        settings: {
+          initial_delta: 1400,
+          max_delta: 2000,
+          n_down: 2,
+          num_reversals: 6,
+          num_trials: 3,
+          reference_duration: 3000
+        },
+        stepIndex: this.state.steps.indexOf('settings')
+      })
+
+      // DEBUGGING:
+      // this.setState({
+      //   stepIndex: this.state.steps.indexOf('results')
+      // })
+    }
+    else {
+      this.setState({stepIndex: this.state.steps.indexOf('intro')})
+    }
+  }
+
   onSubmitResults(results) {
     this.setState({ results });
   }
@@ -63,9 +135,11 @@ class TaskManager extends Component {
   }
 
   render() {
+    console.log('showing: ', this.showing());
+
     if (this.showing() === 'login') {
       return (
-        <Login />
+        <Login finishLogin={this.onLogin} />
       )
     }
 
@@ -80,6 +154,7 @@ class TaskManager extends Component {
     }
 
     if (this.showing() === 'intro') {
+      console.log('settings auth: ', this.state.auth)
       return (
         <div className="vertical-center">
           <div className="container text-center">

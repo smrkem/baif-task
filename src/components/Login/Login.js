@@ -3,7 +3,7 @@ import axios from 'axios';
 
 class Login extends Component {
   state = {
-    token: null
+    token: 'mDn7CymhatBTyIlCDvshyA'
   }
 
   constructor(props) {
@@ -18,18 +18,22 @@ class Login extends Component {
   }
 
   onSubmit() {
-    console.log('submitting token: ', this.state.token);
-
-    const DATA_API_URL = "https://ljcs7k58sf.execute-api.us-east-1.amazonaws.com/dev/study-data/"
+    const DATA_API_URL = "https://ljcs7k58sf.execute-api.us-east-1.amazonaws.com/dev/authorize/"
 
     axios.defaults.headers.common['Authorization'] = this.state.token;
     
-    axios.get(DATA_API_URL).then(response => {
-      console.log("SUCCESS")
-      console.log('response', response)
-    }).catch(error => {
-      console.log("ERROR: ", error)
-    })   
+    axios.post(DATA_API_URL, {}).then(response => {
+      this.setState({message: null})
+      this.props.finishLogin(response.data)
+    }, error => {
+      console.log('error.response: ', error.response)
+      if (error.response.status === 403) {
+        this.setState({
+          message: "Token validation failed.",
+          token: ""
+        })
+      }
+    }) 
   }
 
   render() {
@@ -39,8 +43,16 @@ class Login extends Component {
             <p>Please enter your token:</p>
             <div className="form-group">
               <p>
-                <input name="token" onChange={this.handleFieldChange} />
+                <input name="token" 
+                  value={this.state.token}
+                  onChange={this.handleFieldChange} />
               </p>
+
+              { this.state.message && (
+                <div>
+                  <pre>{this.state.message}</pre>
+                </div>
+              )}
               
               <button 
                 onClick={this.onSubmit}
