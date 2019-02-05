@@ -27,6 +27,15 @@ body > #root > div {
 }
 
 
+
+
+
+
+
+
+
+
+/*  RESULTS */
 #results-wr {
 
 }
@@ -39,4 +48,17 @@ body > #root > div {
     background: #eee;
     font-size: 0.8rem;
     padding: 2rem;
+}
+
+.results-api .authToken-input input,
+.results-api .authToken-input button {
+    display: inline-block;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+}
+.results-api .authToken-input input {
+    vertical-align: middle;
+}
+
+.results-api .submit-data-btn {
+    margin-bottom: 0.5rem;
 }
