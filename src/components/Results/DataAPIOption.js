@@ -17,7 +17,6 @@ class DataAPIOption extends Component {
 
   setAuthToken() {
     const authToken = this.authTokenInput.value;
-    console.log('auth token:', authToken);
 
     this.setState({authToken});
   }
@@ -49,7 +48,6 @@ class DataAPIOption extends Component {
   }
 
   render() {
-    console.log('auth:', this.props.auth);
     return (
       <div className="results-api">
         <h3>Data API:</h3>
@@ -65,22 +63,19 @@ class DataAPIOption extends Component {
               className="btn btn-primary">
               SET TOKEN</button>
           </div>
-          
         )}
-        {
-          this.state.authToken && (
-            <div className="submit-data-btn">
-              <button
-                onClick={this.sendData}
-                className="btn btn-primary">
-                SEND DATA</button>
-            </div>
-          )
-        }
+        {this.state.authToken && (
+          <div className="submit-data-btn">
+            <button
+              onClick={this.sendData}
+              className="btn btn-primary">
+              SEND DATA</button>
+          </div>
+        )}
 
         
 
-        <div>
+        <div className="api-messages">
           {this.state.dataAPIMessages.map((msg, ind) => {
             return (
               <pre key={ind}>{JSON.stringify({
@@ -90,10 +85,6 @@ class DataAPIOption extends Component {
             )
           })}
         </div>
-        
-        <pre>
-          
-        </pre>
       </div>
     )
   }

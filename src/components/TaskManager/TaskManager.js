@@ -132,23 +132,17 @@ class TaskManager extends Component {
   onLogin(auth) {
     this.setState({auth});
 
-    // if (ADMINS.includes(auth.participantId)) {
-    //   this.setState({
-    //     settings: {
-    //       initial_delta: 1400,
-    //       max_delta: 2000,
-    //       n_down: 2,
-    //       num_reversals: 6,
-    //       num_trials: 3,
-    //       reference_duration: 3000
-    //     }
-    //   })
+    console.log('auth:', auth);
 
-      // DEBUGGING:
-      // this.setState({
-      //   stepIndex: this.state.steps.indexOf('results')
-      // })
-    // }
+    if (!ADMINS.includes(auth.participantId) 
+      && this.state.steps.includes("settings")) {
+
+      const steps = [...this.state.steps];
+      steps.splice( steps.indexOf('settings'), 1);
+      this.setState({ steps });
+    }
+
+    this.advanceStep();
   }
 
   onSubmitResults(results) {
