@@ -3,6 +3,8 @@ import ExperimentBlock from '../ExperimentBlock/ExperimentBlock';
 import Results from '../Results/Results';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
+import Intro from '../Intro/Intro';
+
 
 const ADMINS = [
   "matt",
@@ -27,18 +29,50 @@ class TaskManager extends Component {
   constructor(props) {
     super(props);
     this.advanceStep = this.advanceStep.bind(this);
+
+    // for REACT_APP_AUTH_DATA=true
     this.onSubmitResults = this.onSubmitResults.bind(this);
     this.onSubmitSettings = this.onSubmitSettings.bind(this);
     this.onLogin = this.onLogin.bind(this);
 
-    this.state.settings = {
-      initial_delta: 2000,
-      max_delta: 2000,
-      n_down: 3,
-      num_reversals: 6,
-      num_trials: 40,
-      reference_duration: 5000
+    this.state.auth = (process.env.REACT_APP_REQUIRE_AUTH === 'false') ? {disabled: true} : {};
+    
+
+    if (this.state.auth.disabled) {
+      const steps = [...this.state.steps];
+      steps.splice( steps.indexOf('login'), 1);
+      this.state.steps = steps;
     }
+    this.state.showSettings = (process.env.REACT_APP_DISPLAY_SETTINGS === 'true');
+    if (!this.state.showSettings) {
+      const steps = [...this.state.steps];
+      steps.splice( steps.indexOf('settings'), 1);
+      this.state.steps = steps;
+    }
+
+    const n_down = parseInt(process.env.REACT_APP_STAIRCASE_N_DOWN) || 3;
+    const initial_delta = process.env.REACT_APP_STAIRCASE_INITIAL_DELTA || 2000;
+    const max_delta = process.env.REACT_APP_STAIRCASE_MAX_DELTA || 2000;
+    const num_reversals = process.env.REACT_APP_STAIRCASE_MAX_REVERSALS || 6;
+    const num_trials = process.env.REACT_APP_STAIRCASE_MAX_TRIALS || 30;
+    const reference_duration = process.env.REACT_APP_STAIRCASE_REF_DURATION || 5000;
+    const settings = {
+      initial_delta: parseInt(initial_delta),
+      max_delta: parseInt(max_delta),
+      n_down,
+      num_reversals,
+      num_trials,
+      reference_duration
+    }
+
+    if (this.state.showSettings) {
+      settings.initial_delta = 1400;
+      settings.num_trials = 3;
+      settings.reference_duration = 3000;
+    }
+    this.state.settings = settings;
+
+    
 
     // Debugging:
     // this.state.results = {
@@ -88,6 +122,7 @@ class TaskManager extends Component {
   advanceStep() {
     if (this.state.stepIndex === this.state.steps.length - 1) {
       // all done and finished
+      console.log('// all done and finished');
       return; 
     }
 
@@ -95,29 +130,19 @@ class TaskManager extends Component {
   }
 
   onLogin(auth) {
-    this.setState({auth})
+    this.setState({auth});
 
-    if (ADMINS.includes(auth.participantId)) {
-      this.setState({
-        settings: {
-          initial_delta: 1400,
-          max_delta: 2000,
-          n_down: 2,
-          num_reversals: 6,
-          num_trials: 3,
-          reference_duration: 3000
-        },
-        stepIndex: this.state.steps.indexOf('settings')
-      })
+    console.log('auth:', auth);
 
-      // DEBUGGING:
-      // this.setState({
-      //   stepIndex: this.state.steps.indexOf('results')
-      // })
+    if (!ADMINS.includes(auth.participantId) 
+      && this.state.steps.includes("settings")) {
+
+      const steps = [...this.state.steps];
+      steps.splice( steps.indexOf('settings'), 1);
+      this.setState({ steps });
     }
-    else {
-      this.setState({stepIndex: this.state.steps.indexOf('intro')})
-    }
+
+    this.advanceStep();
   }
 
   onSubmitResults(results) {
@@ -132,6 +157,9 @@ class TaskManager extends Component {
   }
 
   render() {
+    console.log("env2", process.env);
+    console.log("steps", this.state.steps);
+    console.log("ndown", this.state);
 
     if (this.showing() === 'login') {
       return (
@@ -151,16 +179,7 @@ class TaskManager extends Component {
 
     if (this.showing() === 'intro') {
       return (
-        <div className="vertical-center">
-          <div className="container text-center">
-            <h2>Welcome to the BAIF task!</h2>
-            <p>BAIF intro and instructions placeholder.</p>
-            <button
-              className="btn btn-primary btn-lg"
-              onClick={this.advanceStep}
-              >Begin</button>
-          </div>
-        </div>
+        <Intro finishStep={this.advanceStep} />
       )
     }
 
@@ -176,7 +195,12 @@ class TaskManager extends Component {
 
     if (this.showing() === 'results') {
       return (
-        <Results results={this.state.results} settings={this.state.settings} />
+        <Results 
+          results={this.state.results}
+          settings={this.state.settings} 
+          auth={this.state.auth}
+          dataAPIEnabled={process.env.REACT_APP_DATA_API_ENABLED === "true"}
+          />
       )
     }
   }

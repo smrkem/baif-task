@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+
+import DataAPIOption from './DataAPIOption';
+
 const CanvasJS = window.CanvasJS;
+
 
 class Results extends Component {
 
@@ -26,26 +29,12 @@ class Results extends Component {
       i++;
     });
     this.state = { 
-      points,
-      dataAPIMessages: []
+      points
     };
 
-    this.sendData = this.sendData.bind(this)
-    this.addDataAPIMessage = this.addDataAPIMessage.bind(this)
-  }
-
-  addDataAPIMessage(message) {
-    const dataAPIMessages = [...this.state.dataAPIMessages]
-    dataAPIMessages.push(message)
-    this.setState({dataAPIMessages})
   }
 
   componentDidMount() {
-    // const points = [
-    //   {x: 5.416, y: 350, markerColor: "red", markerType: "cross", markerSize: 10},
-    //   {x: 9.631, y: 879.1602510283531, markerColor: "green", markerType: "triangle", markerSize: 10}
-    // ];
-    // const ctx = document.getElementById('theGraph').getContext('2d');
     const chart = new CanvasJS.Chart("graph", {
       animationEnabled: true,
       theme: "light2",
@@ -68,21 +57,6 @@ class Results extends Component {
     chart.render();
   }
 
-  sendData() {
-    const DATA_API_URL = "https://ljcs7k58sf.execute-api.us-east-1.amazonaws.com/dev/study-data/"
-    
-    console.log("SENDING DATA")
-    console.log(this.props.results)
-
-    axios.post(DATA_API_URL, this.props.results).then(response => {
-      this.addDataAPIMessage(response)
-    }, error => {
-      console.log("ERROR: ", error.response)
-      this.addDataAPIMessage(error.response)
-    })   
-
-  }
-
   render() {
     let { results, settings } = this.props;
     console.log('results with', this.props.results);
@@ -100,35 +74,22 @@ class Results extends Component {
             {JSON.stringify(settings, null, 2)}
           </pre>
         </div>
+
+        {this.props.dataAPIEnabled && (
+          <DataAPIOption 
+            results={this.props.results}
+            auth={this.props.auth}
+          />
+        )}
+        
         <div className="results-data">
           <h3>Results:</h3>
           <pre>
             {JSON.stringify(results, null, 2)}
           </pre>
         </div>
-        <div className="results-api">
-          <h3>Data API:</h3>
-          <button
-            onClick={this.sendData}
-            className="btn btn-primary">
-            SEND DATA</button>
-
-          <div>
-            {this.state.dataAPIMessages.map((msg, ind) => {
-              console.log('msg', msg)
-              return (
-                <pre key={ind}>{JSON.stringify({
-                  data: msg.data,
-                  status: msg.status
-                }, null, 2)}</pre>
-              )
-            })}
-          </div>
-          
-          <pre>
-            
-          </pre>
-        </div>
+        
+        
       </div>
     )
   }
