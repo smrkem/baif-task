@@ -31,7 +31,7 @@ class ExperimentBlock extends Component {
     staircase = new Staircase({
       firstVal: settings.initial_delta,
       down: settings.n_down,
-      stepSizes: [8, 4, 4, 2, 2],
+      stepSizes: settings.stepsizes,
       maxValue: settings.max_delta,
       verbosity: 1
     });
@@ -103,6 +103,7 @@ class ExperimentBlock extends Component {
       }
 
       staircase.addResponse(data.responded_correctly);
+      data.reversal_index = staircase.reversal_indexes.length;
       
       if (staircase.reversal_indexes.length >= NUM_REVERSALS) {
         jsPsych.endExperiment();
@@ -210,6 +211,7 @@ class ExperimentBlock extends Component {
         if (trialPart.forcedChoice) {
           currentTrial.response = trialPart.response;
           currentTrial.responded_correctly = trialPart.responded_correctly;
+          currentTrial.reversal_index = trialPart.reversal_index;
         }
     });
     trials.push(currentTrial);

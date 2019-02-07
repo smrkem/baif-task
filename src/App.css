@@ -14,19 +14,27 @@ body > #root > div {
 
     /* SETTINGS */
 .settings-page table {
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .settings-page td {
     width: 160px;
 }
 
-.settings-page input {
+.settings-page table input {
     width: 100px;
     text-align: right;
 }
 
+.settings-page .input-group {
+    align-items: center;
+    margin-bottom: 2rem;
+}
 
+.settings-page .input-group label {
+    margin-bottom: 0;
+    width: 160px;
+}
 
 
 

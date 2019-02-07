@@ -8,32 +8,60 @@ class Settings extends React.Component {
     reference_duration: 5000,
     n_down: 3,
     initial_delta: 2000,
-    max_delta: 2000
+    max_delta: 2000,
+    stepsizes: "400, 200, 100, 50"
   }
 
   constructor(props) {
     super(props);
 
     const { defaults } = props;
-    console.log(defaults);
 
     defaults && Object.keys(defaults).forEach(key => {
-      this.state[key] = defaults[key]
+      if (key === 'stepsizes') {
+        this.state['stepsizes'] = this.stepSizesToString(defaults['stepsizes']);
+      }
+      else {
+        this.state[key] = defaults[key];
+      }
     })
 
     this.onSubmit = this.onSubmit.bind(this);
     this.handleFieldChange = this.handleFieldChange.bind(this);
   }
 
+  stepSizesToString(stepSizes) {
+    const stepSizesString = stepSizes.join(", ");
+    return stepSizesString;
+  }
+
+  stepSizesFromString(stepSizesString) {
+    const stepSizes = [];
+
+    stepSizesString.split(",").forEach((step) => {
+      stepSizes.push( parseInt(step.trim()) );
+      if ( isNaN(stepSizes[stepSizes.length - 1]) ) {
+        throw Error("invalid step value");
+      }
+    });
+
+    return stepSizes;
+  }
+
   onSubmit(e) {
     e.preventDefault();
 
-    this.props.submitSettings(this.state);
+    this.props.submitSettings({
+      ...this.state,
+      stepsizes: this.stepSizesFromString(this.state.stepsizes)
+    });
     this.props.finishStep();
   }
 
   handleFieldChange(e) {
-    this.setState({[e.target.name]: parseInt(e.target.value)});
+    const key = e.target.name;
+    let value = (key === 'stepsizes') ? e.target.value : parseInt(e.target.value);
+    this.setState({[key]: value});
   }
 
   render() {
@@ -109,12 +137,20 @@ class Settings extends React.Component {
                   />
                 </td>
               </tr>
+
               </tbody>
             </table>
 
 
             
-
+            <div className="input-group">
+              <label>Staircase Stepsizes:</label>
+              <input 
+                    name="stepsizes"
+                    value={this.state.stepsizes} 
+                    onChange={this.handleFieldChange} 
+                  />
+            </div>
 
 
             <div>
