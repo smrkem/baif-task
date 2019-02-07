@@ -59,6 +59,7 @@ class TaskManager extends Component {
     const settings = {
       initial_delta: parseInt(initial_delta),
       max_delta: parseInt(max_delta),
+      stepsizes: [400, 200, 100, 50],
       n_down,
       num_reversals,
       num_trials,
@@ -157,9 +158,9 @@ class TaskManager extends Component {
   }
 
   render() {
-    console.log("env2", process.env);
-    console.log("steps", this.state.steps);
-    console.log("ndown", this.state);
+    // console.log("env2", process.env);
+    // console.log("steps", this.state.steps);
+    // console.log("ndown", this.state);
 
     if (this.showing() === 'login') {
       return (
