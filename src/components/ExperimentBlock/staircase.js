@@ -45,51 +45,64 @@ class Staircase {
     this.values.push(this.getNextValue(response));
   }
 
-  getNextValue(correctResponse) {
-    const trialIndex = this.responses.length;
-    console.log('responses: ', this.responses); 
-    console.log('trialIndex: ', trialIndex);
 
-    if (!correctResponse && this.successiveBad >= this.n_up) {
-      this.successiveBad = 0;
 
-      
-      if (this.currentDirection === -1) {
-        this.reversal_indexes.push(trialIndex);
+  detectReversal() {
+
+    const lastReversalIndex = (this.reversal_indexes[this.reversal_indexes.length - 1] - 1) || 0;
+    const lastResponses = this.responses.slice(lastReversalIndex);
+
+    let consecutiveHits = 0;
+    let thenMiss = 0;
+
+    lastResponses.forEach(response => {
+      if (response && consecutiveHits < this.n_down) {
+        consecutiveHits++;
+      }
+
+      if ((consecutiveHits === this.n_down) && !response) {
+        thenMiss = 1;
+      }
+
+      if ((thenMiss === 1) && response) {
+        // Reversal!!!!!
+        this.reversal_indexes.push(this.responses.length);
         this.incrementStepSizeIndex();
 
         if (this.verbosity > 0) {
           console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
         }
       }
+    })
+  }
+
+  getNextValue(correctResponse) {
+    // console.log('responses: ', this.responses);
+
+    this.detectReversal(correctResponse);
+
+    if (!correctResponse && this.successiveBad >= this.n_up) {
+      this.successiveBad = 0;
+      
       this.currentDirection = 1;
       const newVal = Math.min(this._nextVal(), this.maxValue);
       if (this.verbosity > 0) {
           console.log("Decreasing stair difficulty. Setting new value to " + newVal + "ms.");
+          console.log('=============================');
       }
-      console.log('=============================');
+      
       return newVal;
     }
     else if (correctResponse && this.successiveGood >= this.n_down) {
       this.successiveGood = 0;
 
-      // if (this.currentDirection === 1) {
-      //   this.reversal_indexes.push(trialIndex);
-      //   this.incrementStepSizeIndex();
-
-      //   if (this.verbosity > 0) {
-      //     console.log('reversal!!!!!');
-      //     console.log('reversal!!!!! new stepSizeIndex: ', this.currentStepSizeIndex);
-      //     console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
-      //     console.log('reversal!!!!! new currentDirection: ', '-1');
-      //   }
-      // }
       this.currentDirection = -1;
       const newVal = Math.max(this._nextVal(), this.minValue);
       if (this.verbosity > 0) {
         console.log("Increasing stair difficulty. Setting new value to " + newVal + "ms.");
+        console.log('=============================');
       }
-      console.log('=============================');
+
       return newVal;
     }
     else if (this.currentDirection === 0) {
@@ -101,7 +114,7 @@ class Staircase {
       }
     }
 
-    console.log('=============================');
+    // console.log('=============================');
     return this.getValue();
   }
 

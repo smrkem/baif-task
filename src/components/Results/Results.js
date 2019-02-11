@@ -22,7 +22,7 @@ class Results extends Component {
       }
       if (props.results.reversalIndices.includes(i)) {
         point.markerColor = "#bada55";
-        point.markerType = "circle";
+        point.markerType = point.markerType === "triangle" ? "circle" : "square";
         point.markerSize = 20;
       }
       points.push(point);
