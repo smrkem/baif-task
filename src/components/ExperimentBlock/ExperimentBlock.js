@@ -113,6 +113,24 @@ class ExperimentBlock extends Component {
     
   }
 
+  feedback = {
+    type: "html-keyboard-response",
+    stimulus: () => {
+      const trialData = JSON.parse(
+        jsPsych.data.getLastTimelineData().filter({forcedChoice: true}).json()
+      ).pop();
+      const msg = trialData.responded_correctly ? "Correct" : "Incorrect";
+
+      return (
+        `<div class="trialFeedback">${msg}</div>`
+      )
+    },
+    response_ends_trial: false,
+    data: {feedback: true},
+    trial_duration: 500
+  }
+
+
   fixation = {
     type: "html-keyboard-response",
     stimulus: '<div style="font-size: 60px;">+</div>',
@@ -140,7 +158,8 @@ class ExperimentBlock extends Component {
         this.fixation,
         this.referencePulse,
         this.targetPulse,
-        this.forcedChoice
+        this.forcedChoice,
+        this.feedback
       ],
       repetitions: NUM_TRIALS
     }
@@ -196,7 +215,8 @@ class ExperimentBlock extends Component {
           'fixation',
           'referencePulse',
           'targetPulse',
-          'forcedChoice'
+          'forcedChoice',
+          'feedback'
         ].forEach((n) => {
           if (trialPart[n]) {
             currentTrial[`${n}_time_elapsed`] = trialPart.time_elapsed;
