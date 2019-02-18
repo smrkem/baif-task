@@ -6,12 +6,13 @@ import './jsPsychPlugins/ms-html-animated-circle'
 import 'jspsych/plugins/jspsych-fullscreen'
 import './ExperimentBlock.css';
 import { Staircase } from './staircase';
-import { randomFromInterval } from '../../utils';
+import { randomFromInterval, getMeanForLast } from '../../utils';
 
 
 const jsPsych = window.jsPsych;
 
 let staircase = null;
+const FINAL_SCORE_NUM_VALUES = 6;
 let REFERENCE_DURATION = null;
 let NUM_REVERSALS = null;
 let NUM_TRIALS = null;
@@ -143,14 +144,6 @@ class ExperimentBlock extends Component {
   getTimeline() {
     const timeline = [];
 
-    // const test_procedure = {
-    //   timeline: [
-    //     this.fixation,
-    //     this.forcedChoice
-    //   ],
-    //   repetitions: 2
-    // }
-
     this.fixation.data.beginTrial = true;
 
     const test_procedure = {
@@ -179,20 +172,23 @@ class ExperimentBlock extends Component {
   }
 
   onExperimentFinish() {
-    // console.log('done');
     const trialData = JSON.parse(
       jsPsych.data.get().json()
     );
-    console.log('done data: ', trialData);
-    console.log('staircase:', staircase);
+
+    const staircaseValues = [...staircase.values];
+    // Last value in values never got ran:
+    staircaseValues.pop();
 
     let data = this.collectTrials(trialData);
-    // data.trialData = trialData;
-
-    // gather results
     this.props.submitResults({
       data: data,
-      reversalIndices: staircase.reversal_indexes
+      reversalIndices: staircase.reversal_indexes,
+      computed_data: {
+        'final_score': getMeanForLast(staircaseValues, FINAL_SCORE_NUM_VALUES),
+        'num_trials': data.length,
+        'num_reversals': staircase.reversal_indexes.length
+      }
     });
     this.props.finishStep();
   }

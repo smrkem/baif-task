@@ -59,7 +59,6 @@ class Results extends Component {
 
   render() {
     let { results, settings } = this.props;
-    console.log('results with', this.props.results);
 
     return (
       <div id="results-wr" className="container">
