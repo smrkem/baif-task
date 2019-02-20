@@ -21,7 +21,7 @@ class Staircase {
     this.n_down = settings.down;
     this.currentStepSizeIndex = 0;
     this.reversal_indexes = [];
-    this.currentDirection = 0
+    this.currentDirection = 0; // 1 for increasing delta, -1 for decreasing delta
     this.verbosity = settings.verbosity || 0
 }
 
@@ -42,44 +42,74 @@ class Staircase {
       this.successiveBad++;
     }
 
+    this.detectReversal(response);
     this.values.push(this.getNextValue(response));
   }
 
 
 
-  detectReversal() {
+  detectReversal(hit) {
+    // if (!hit && this.successiveGood >= this.n_up) {
+    //   this.currentDirection = 1;
+    // }
+    // if (!hit && this.successiveBad >= this.n_up) {
+    //   this.successiveBad = 0;
+      
+    //   if (this.currentDirection === -1) {
+    //     // Reversal!!
+    //     this.incrementStepSizeIndex();
+    //   }
+      
+    // }
+    // else if (hit && this.successiveGood >= this.n_down) {
+    //   this.successiveGood = 0;
 
-    const lastReversalIndex = (this.reversal_indexes[this.reversal_indexes.length - 1] - 1) || 0;
-    const lastResponses = this.responses.slice(lastReversalIndex);
+    //   if (this.currentDirection === 1) {
+    //     // Reversal!!
+    //     this.incrementStepSizeIndex();
+    //   }
+    //   this.currentDirection = -1;
+    // }
 
-    let consecutiveHits = 0;
-    let thenMiss = 0;
+    // if (this.currentDirection === 0) {
+    //   if (correctResponse && this.successiveGood >= this.n_down) {
+    //     this.currentDirection = -1;  
+    //   }
+    //   // else if (!correctResponse && this.currentDirection >= this.n_up) {
+    //   //   this.currentDirection = 1;
+    //   // }
+    // }
+    // const lastReversalIndex = (this.reversal_indexes[this.reversal_indexes.length - 1] - 1) || 0;
+    // const lastResponses = this.responses.slice(lastReversalIndex);
 
-    lastResponses.forEach(response => {
-      if (response && consecutiveHits < this.n_down) {
-        consecutiveHits++;
-      }
+    // let consecutiveHits = 0;
+    // let thenMiss = 0;
 
-      if ((consecutiveHits === this.n_down) && !response) {
-        thenMiss = 1;
-      }
+    // lastResponses.forEach(response => {
+    //   if (response && consecutiveHits < this.n_down) {
+    //     consecutiveHits++;
+    //   }
 
-      if ((thenMiss === 1) && response) {
-        // Reversal!!!!!
-        this.reversal_indexes.push(this.responses.length);
-        this.incrementStepSizeIndex();
+    //   if ((consecutiveHits === this.n_down) && !response) {
+    //     thenMiss = 1;
+    //   }
 
-        if (this.verbosity > 0) {
-          console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
-        }
-      }
-    })
+    //   if ((thenMiss === 1) && response) {
+    //     // Reversal!!!!!
+    //     this.reversal_indexes.push(this.responses.length);
+    //     this.incrementStepSizeIndex();
+
+    //     if (this.verbosity > 0) {
+    //       console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
+    //     }
+    //   }
+    // })
   }
 
   getNextValue(correctResponse) {
     // console.log('responses: ', this.responses);
 
-    this.detectReversal(correctResponse);
+    // this.detectReversal(correctResponse);
 
     if (!correctResponse && this.successiveBad >= this.n_up) {
       this.successiveBad = 0;
@@ -124,8 +154,14 @@ class Staircase {
   }
 
   incrementStepSizeIndex() {
-    if (this.currentStepSizeIndex === this.stepSizes.length - 1) { return }
-    this.currentStepSizeIndex++;
+    this.reversal_indexes.push(this.responses.length);
+    if (this.verbosity > 0) {
+      console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
+    }
+
+    if (this.currentStepSizeIndex < this.stepSizes.length - 1) { 
+      this.currentStepSizeIndex++;
+    }
   }
 }
 
