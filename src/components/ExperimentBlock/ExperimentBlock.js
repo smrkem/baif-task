@@ -13,6 +13,7 @@ const jsPsych = window.jsPsych;
 
 let staircase = null;
 const FINAL_SCORE_NUM_VALUES = 6;
+const FINAL_REVERSALS_NUM_VALUES = 6;
 let REFERENCE_DURATION = null;
 let NUM_REVERSALS = null;
 let NUM_TRIALS = null;
@@ -179,6 +180,8 @@ class ExperimentBlock extends Component {
     const staircaseValues = [...staircase.values];
     // Last value in values never got ran:
     staircaseValues.pop();
+    // reversal_indexes is 1 indexed.
+    const reversal_deltas = staircase.reversal_indexes.map(i => staircaseValues[i - 1])
 
     let data = this.collectTrials(trialData);
     this.props.submitResults({
@@ -186,6 +189,7 @@ class ExperimentBlock extends Component {
       reversalIndices: staircase.reversal_indexes,
       computed_data: {
         'final_score': getMeanForLast(staircaseValues, FINAL_SCORE_NUM_VALUES),
+        'final_reversals_mean': getMeanForLast(reversal_deltas, FINAL_REVERSALS_NUM_VALUES),
         'num_trials': data.length,
         'num_reversals': staircase.reversal_indexes.length
       }

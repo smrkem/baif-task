@@ -42,121 +42,65 @@ class Staircase {
       this.successiveBad++;
     }
 
-    this.detectReversal(response);
     this.values.push(this.getNextValue(response));
   }
 
 
 
   detectReversal(hit) {
-    // if (!hit && this.successiveGood >= this.n_up) {
-    //   this.currentDirection = 1;
-    // }
-    // if (!hit && this.successiveBad >= this.n_up) {
-    //   this.successiveBad = 0;
-      
-    //   if (this.currentDirection === -1) {
-    //     // Reversal!!
-    //     this.incrementStepSizeIndex();
-    //   }
-      
-    // }
-    // else if (hit && this.successiveGood >= this.n_down) {
-    //   this.successiveGood = 0;
+    console.log("hit: ", hit);
+    console.log("currDir:", this.currentDirection);
 
-    //   if (this.currentDirection === 1) {
-    //     // Reversal!!
-    //     this.incrementStepSizeIndex();
-    //   }
-    //   this.currentDirection = -1;
-    // }
-
-    // if (this.currentDirection === 0) {
-    //   if (correctResponse && this.successiveGood >= this.n_down) {
-    //     this.currentDirection = -1;  
-    //   }
-    //   // else if (!correctResponse && this.currentDirection >= this.n_up) {
-    //   //   this.currentDirection = 1;
-    //   // }
-    // }
-    // const lastReversalIndex = (this.reversal_indexes[this.reversal_indexes.length - 1] - 1) || 0;
-    // const lastResponses = this.responses.slice(lastReversalIndex);
-
-    // let consecutiveHits = 0;
-    // let thenMiss = 0;
-
-    // lastResponses.forEach(response => {
-    //   if (response && consecutiveHits < this.n_down) {
-    //     consecutiveHits++;
-    //   }
-
-    //   if ((consecutiveHits === this.n_down) && !response) {
-    //     thenMiss = 1;
-    //   }
-
-    //   if ((thenMiss === 1) && response) {
-    //     // Reversal!!!!!
-    //     this.reversal_indexes.push(this.responses.length);
-    //     this.incrementStepSizeIndex();
-
-    //     if (this.verbosity > 0) {
-    //       console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
-    //     }
-    //   }
-    // })
+    if ((!hit && this.currentDirection === -1) || (hit && this.currentDirection === 1)) {
+      this.incrementStepSizeIndex();
+    }
   }
 
-  getNextValue(correctResponse) {
-    // console.log('responses: ', this.responses);
-
-    // this.detectReversal(correctResponse);
-
-    if (!correctResponse && this.successiveBad >= this.n_up) {
+  getNextValue(hit) {
+    if (!hit && this.successiveBad >= this.n_up) { // Get Easier
       this.successiveBad = 0;
-      
+      this.detectReversal(hit);
       this.currentDirection = 1;
-      const newVal = Math.min(this._nextVal(), this.maxValue);
+
+      const newVal = this._nextVal();
       if (this.verbosity > 0) {
           console.log("Decreasing stair difficulty. Setting new value to " + newVal + "ms.");
           console.log('=============================');
       }
-      
       return newVal;
     }
-    else if (correctResponse && this.successiveGood >= this.n_down) {
+    else if (hit && this.successiveGood >= this.n_down) { // Get Harder
       this.successiveGood = 0;
-
+      this.detectReversal(hit);
       this.currentDirection = -1;
-      const newVal = Math.max(this._nextVal(), this.minValue);
+
+      const newVal = this._nextVal();
       if (this.verbosity > 0) {
         console.log("Increasing stair difficulty. Setting new value to " + newVal + "ms.");
         console.log('=============================');
       }
-
       return newVal;
     }
-    else if (this.currentDirection === 0) {
-      if (correctResponse && this.successiveGood >= this.n_down) {
-        this.currentDirection = -1;  
-      }
-      else if (!correctResponse && this.currentDirection >= this.n_up) {
-        this.currentDirection = 1;
+    else {
+      if (this.verbosity > 0) {
+        console.log("Maintaining value at " + this.getValue() + "ms.");
+        console.log('=============================');
       }
     }
 
-    // console.log('=============================');
     return this.getValue();
   }
 
   _nextVal() {
     const incr = this.stepSizes[this.currentStepSizeIndex] * this.currentDirection;
-    return this.getValue() + incr;
+    const nextVal = this.getValue() + incr;
+    return Math.max(Math.min(nextVal, this.maxValue), this.minValue);
   }
 
   incrementStepSizeIndex() {
-    this.reversal_indexes.push(this.responses.length);
+    this.reversal_indexes.push(this.responses.length); // 1 indexed
     if (this.verbosity > 0) {
-      console.log('reversal!!!!! new dB ratio: ', this.stepSizes[this.currentStepSizeIndex]);
+      console.log('Reversal! next increment: ', this.stepSizes[this.currentStepSizeIndex]);
     }
 
     if (this.currentStepSizeIndex < this.stepSizes.length - 1) { 

@@ -12,7 +12,7 @@ const getMeanForLast = (arr, n) => {
   for (var i = 0; i < data.length; i++) {
     sum += data[i];
   }
-  return Math.round(sum / n);
+  return Math.round(100 * sum / n)/100;
 }
 
 
