@@ -6,11 +6,6 @@ import Login from '../Login/Login';
 import Intro from '../Intro/Intro';
 
 
-const ADMINS = [
-  "matt",
-  "norm"
-]
-
 class TaskManager extends Component {
   state = {
     settings: null,
@@ -73,8 +68,6 @@ class TaskManager extends Component {
     }
     this.state.settings = settings;
 
-    
-
     // Debugging:
     // this.state.results = {
     //   "data": [
@@ -135,14 +128,6 @@ class TaskManager extends Component {
 
     console.log('auth:', auth);
 
-    if (!ADMINS.includes(auth.participantId) 
-      && this.state.steps.includes("settings")) {
-
-      const steps = [...this.state.steps];
-      steps.splice( steps.indexOf('settings'), 1);
-      this.setState({ steps });
-    }
-
     this.advanceStep();
   }
 
@@ -158,10 +143,6 @@ class TaskManager extends Component {
   }
 
   render() {
-    // console.log("env2", process.env);
-    // console.log("steps", this.state.steps);
-    // console.log("ndown", this.state);
-
     if (this.showing() === 'login') {
       return (
         <Login finishLogin={this.onLogin} />

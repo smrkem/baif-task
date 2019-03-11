@@ -21,9 +21,8 @@ class Results extends Component {
         markerSize: 10
       }
       if (props.results.reversalIndices.includes(i)) {
-        point.markerColor = "#bada55";
-        point.markerType = point.markerType === "triangle" ? "circle" : "square";
-        point.markerSize = 20;
+        point.markerType = point.markerType === "circle";
+        point.markerSize = 15;
       }
       points.push(point);
       i++;

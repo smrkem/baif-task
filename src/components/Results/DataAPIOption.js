@@ -28,21 +28,36 @@ class DataAPIOption extends Component {
   }
 
   sendData() {
-    const DATA_API_URL = "https://ljcs7k58sf.execute-api.us-east-1.amazonaws.com/dev/study-data/"
+    const DATA_API_URL = "https://6rn8zjuxgg.execute-api.us-east-1.amazonaws.com/dev/submit-data/"
     
     console.log(this.props.results)
     console.log("SENDING DATA with token: ", this.state.authToken);
     axios.defaults.headers.common['Authorization'] = this.state.authToken;
     
-
-    axios.post(DATA_API_URL, this.props.results).then(response => {
+    const postData = {
+      submission: {
+        'participant_data': {
+          'type': 'bucket',
+          'filename': '{participantId}/participant-{participantId}.{timestamp}.json',
+          'data': this.props.results.data
+        },
+        'experiment_data': {
+          'type': 'db_table',
+          'data': this.props.results.computed_data
+        }
+      } 
+    }
+    axios.post(DATA_API_URL, postData).then(response => {
       this.addDataAPIMessage(response)
     }, error => {
-      console.log("ERROR: ", error.response)
-      if (error.response.status === 403) {
+      const status = error.status || error.response.status || null;
+      if (status === 403) {
         this.setState({authToken: ""});
       }
-      this.addDataAPIMessage(error.response)
+
+      const response = error.response || error;
+      console.log("ERROR: ", response);
+      this.addDataAPIMessage(response);
     })   
 
   }
