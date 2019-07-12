@@ -10,7 +10,9 @@ body > #root > div {
 
 
 
-
+#jspsych-experiment {
+    height: 100vh;
+}
 
     /* SETTINGS */
 .settings-page table {
